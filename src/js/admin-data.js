@@ -408,13 +408,13 @@
     });
 
     // Поиск по Компании с debounce
-    let debounceTimercompany  = null;
+    let debounceTimercompany = null;
     document.getElementById('filter_company').addEventListener('input', (e) => {
       clearTimeout(debounceTimercompany);
       debounceTimercompany = setTimeout(() => {
-        filterState.company = e.target.value.trim();
-        filterState.page = 1;
-        loadTableData();
+        const value = e.target.value.trim();
+        const table = $('#myTable').DataTable();
+        table.column(20).search(value, true, false).draw(); // ✅ RegExp в действии
       }, 400);
     });
 
@@ -468,12 +468,21 @@
           });
       });
 
+    let currentRecordId = null;
+
     $('#myTable tbody').on('dblclick', 'tr', function () {
       const rowData = table.row(this).data();
+      // Получаем ID из data-атрибута строки
+      const recordId = $(this).data('id');
 
+      // Сохраняем ID в глобальную переменную
+      currentRecordId = recordId;
+
+      // Также можно сохранить в модальное окно, если нужно
       const modal = document.getElementById('modalEdit');
-      modal.dataset.id = $(this).data('id');
-      console.log('Текущий ID:', modal.dataset.id);
+      modal.dataset.id = recordId;
+
+      console.log('Текущий ID:', currentRecordId);
 
       // Пример: вставка данных в модальное окно
       const select = document.getElementById('city-select');
@@ -521,189 +530,189 @@
 
     });
 
-    async function submitForm(currentRecordId) {
-      const department = document.getElementById('city-select').value;
-        const payValue = document.getElementById('pay').value;
-        const cleanValue = payValue.replace(/\s/g, ''); // удаляет все пробелы
-        const actual_payment = parseFloat(cleanValue);
-      const iin_bin = document.getElementById('iin-bin').value;
-      const evaluation_count = document.getElementById('count-grade').value;
-      const customer_name = document.getElementById('client').value;
-      const bank_name = document.getElementById('bank').value;
-      const payer = document.getElementById('payer').value;
-        const rawValue = document.getElementById('cost').value;
-        const cleanedValue = rawValue.replace(/\s/g, ''); // удаляет все пробелы
-        const cost = parseFloat(cleanedValue);
-      const object_name = document.getElementById('object').value;
-        const areaValue = document.getElementById('area').value;
-        const cleaValue = areaValue.replace(/\s/g, ''); // удаляет все пробелы
-        const area = parseFloat(cleaValue);
-      const object_address = document.getElementById('address').value;
-        const resultValue = document.getElementById('result').textContent;
-        const clValue = resultValue.replace(/\s/g, '').replace(',', '.');
-        const cost_per_sqm = parseFloat(clValue);
-      const contract_number = document.getElementById('number-deal').value;
-      const title_number = document.getElementById('number-titul').value;
-      const contract_date = document.getElementById('date-deal').value;
-      const is_offsite = document.getElementById('trip').value;
-        const sumValue = document.getElementById('sum-deal').value;
-        const cleValue = sumValue.replace(/\s/g, ''); // удаляет все пробелы
-        const contract_amount = parseFloat(cleValue);
-        const company = document.getElementById('company').value;
+      async function submitForm(currentRecordId) {
+          const department = document.getElementById('city-select').value;
+          const payValue = document.getElementById('pay').value.replace(/\s/g, '');
+          const actual_payment = parseFloat(payValue);
 
-      const requiredFields = [
-        'city-select', 'pay', 'iin-bin', 'count-grade', 'client', 'bank',
-        'payer', 'cost', 'object', 'area', 'address', 'number-deal',
-        'number-titul', 'date-deal', 'trip', 'sum-deal', 'company'
-      ];
+          const iin_bin = document.getElementById('iin-bin').value;
+          const evaluation_count = document.getElementById('count-grade').value;
+          const customer_name = document.getElementById('client').value;
+          const bank_name = document.getElementById('bank').value;
+          const payer = document.getElementById('payer').value;
+          const cost = parseFloat(document.getElementById('cost').value.replace(/\s/g, ''));
+          const object_name = document.getElementById('object').value;
+          const area = parseFloat(document.getElementById('area').value.replace(/\s/g, ''));
+          const object_address = document.getElementById('address').value;
+          const cost_per_sqm = parseFloat(document.getElementById('result').textContent.replace(/\s/g, '').replace(',', '.'));
+          const contract_number = document.getElementById('number-deal').value;
+          const title_number = document.getElementById('number-titul').value;
+          const contract_date = document.getElementById('date-deal').value;
+          const is_offsite = document.getElementById('trip').value;
+          const contract_amount = parseFloat(document.getElementById('sum-deal').value.replace(/\s/g, ''));
+          const company = document.getElementById('company').value;
 
-      for (let id of requiredFields) {
-        const element = document.getElementById(id);
-        if (!element.value.trim()) {
-          alert('Пожалуйста, заполните все поля!');
-          element.focus();
-          return;
-        }
-      }
+          const requiredFields = [
+            'city-select', 'pay', 'iin-bin', 'count-grade', 'client', 'bank',
+            'payer', 'cost', 'object', 'area', 'address', 'number-deal',
+            'number-titul', 'date-deal', 'trip', 'sum-deal', 'company'
+          ];
 
-      const payload = {
-        department,
-        actual_payment,
-        iin_bin,
-        evaluation_count,
-        customer_name,
-        bank_name,
-        payer,
-        cost,
-        object_name,
-        area,
-        object_address,
-        cost_per_sqm,
-        contract_number,
-        title_number,
-        contract_date,
-        is_offsite,
-        contract_amount,
-        company
-      };
-
-      try {
-
-        const response = await authorizedFetch(`https://globalcapital.kz/api/reestr/${currentRecordId}/`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(payload)
-        });
-
-        if (!response.ok) {
-          throw new Error('Ошибка при отправке данных');
-        }
-
-        const data = await response.json();
-
-      } catch (error) {
-//          alert('Произошла ошибка при сохранении, попробуйте еще раз');
-        }
-    }
-
-    document.getElementById('save-button').addEventListener('click', async function () {
-      const modal = document.getElementById('modalEdit');
-      const currentRecordId = modal.dataset.id;
-
-      if (!currentRecordId) {
-        alert('ID записи не найден!');
-        return;
-      }
-
-      await submitForm(currentRecordId);
-      window.location.reload();
-    });
-
-    document.getElementById('delete-data').addEventListener('click', async function () {
-      const modal = document.getElementById('modalEdit');
-      const currentRecordId = modal.dataset.id;
-
-      if (!currentRecordId) {
-        alert('ID записи не найден!');
-        return;
-      }
-
-      try {
-        const response = await authorizedFetch(`https://globalcapital.kz/api/reestr/${currentRecordId}/`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json'
+          for (let id of requiredFields) {
+            const element = document.getElementById(id);
+            if (!element.value.trim()) {
+              alert('⚠️ Пожалуйста, заполните все поля!');
+              element.focus();
+              return;
+            }
           }
-        });
 
-        if (!response.ok) {
-          throw new Error('Ошибка при удалении записи');
-        }
+          const payload = {
+            department,
+            actual_payment,
+            iin_bin,
+            evaluation_count,
+            customer_name,
+            bank_name,
+            payer,
+            cost,
+            object_name,
+            area,
+            object_address,
+            cost_per_sqm,
+            contract_number,
+            title_number,
+            contract_date,
+            is_offsite,
+            contract_amount,
+            company
+          };
 
-        window.location.reload();
-      } catch (error) {
-        alert('Произошла ошибка при удалении: ' + error.message);
+          try {
+            const response = await authorizedFetch(`https://globalcapital.kz/api/reestr/${currentRecordId}/`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+              const errorData = await response.json().catch(() => ({}));
+              console.error('Ошибка:', errorData);
+              alert('❌ Ошибка при сохранении данных. Проверьте заполненные поля или повторите попытку позже.');
+              return;
+            }
+
+            const data = await response.json();
+            alert('✅ Данные успешно изменены');
+
+          } catch (error) {
+            console.error('Ошибка при отправке:', error);
+            alert('❌ Произошла непредвиденная ошибка при сохранении.');
+          }
       }
-    });
+
+           // Кнопка Сохранить в модальном окне
+           document.getElementById('save-button').addEventListener('click', async function (event) {
+              event.preventDefault();
+
+              if (!currentRecordId) {
+                alert('ID записи не найден!');
+                return;
+              }
+
+              await submitForm(currentRecordId);
+              await loadTableData();
+              toggleModal('modalEdit', false); // закрыть модалку
+            });
+
+            // Кнопка Удалить в модальном окне
+            document.getElementById('delete-data').addEventListener('click', async function () {
+              event.preventDefault();
+
+              if (!currentRecordId) {
+                alert('ID записи не найден!');
+                return;
+              }
+
+              try {
+                const response = await authorizedFetch(`https://globalcapital.kz/api/reestr/${currentRecordId}/`, {
+                  method: 'DELETE',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  }
+                });
+
+                if (!response.ok) {
+                  throw new Error('Ошибка при удалении записи');
+                }
+
+                await loadTableData();
+                toggleModal('modalEdit', false); // закрыть модалку
+              } catch (error) {
+                alert('Произошла ошибка при удалении: ' + error.message);
+              }
+            });
 
     loadTableData();
   });
 
+  // Кнопка Выйти
   document.getElementById('exit').addEventListener('click', function () {
-          window.location.href = '/index.html';
-      });
+      window.location.href = '/index.html';
+  });
 
-  document.getElementById('download-excel').addEventListener('click', function (event) {
-      event.preventDefault();
+ // Кнопка Скачать данные
+ document.getElementById('download-excel').addEventListener('click', function (event) {
+    event.preventDefault();
 
-      const startDate = document.getElementById('start-date').value;
-      const endDate = document.getElementById('end-date').value;
-      const button = document.getElementById('download-excel');
+    const startDate = document.getElementById('start-date').value;
+    const endDate = document.getElementById('end-date').value;
+    const button = document.getElementById('download-excel');
 
-      if (!startDate || !endDate) {
-        alert('Пожалуйста, выберите дату начала и дату окончания');
-        return;
+    if (!startDate || !endDate) {
+      alert('Пожалуйста, выберите дату начала и дату окончания');
+      return;
+    }
+
+    // Изменяем текст и отключаем кнопку
+    button.textContent = 'Загрузка...';
+    button.disabled = true;
+
+    const url = `https://globalcapital.kz/api/reestr/download-excel/?start_date=${startDate}&end_date=${endDate}`;
+
+    authorizedFetch(url)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Ошибка при загрузке файла');
       }
-
-      // Изменяем текст и отключаем кнопку
-      button.textContent = 'Загрузка...';
-      button.disabled = true;
-
-      const url = `https://globalcapital.kz/api/reestr/download-excel/?start_date=${startDate}&end_date=${endDate}`;
-
-      authorizedFetch(url)
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Ошибка при загрузке файла');
-          }
-          return response.blob();
-        })
-        .then(blob => {
-          const downloadUrl = window.URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = downloadUrl;
-          a.download = 'reestr.xlsx';
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-          window.URL.revokeObjectURL(downloadUrl);
-        })
-        .catch(error => {
-          console.error('Ошибка:', error);
-          alert('Не удалось загрузить файл.');
-        })
-        .finally(() => {
-          // Возвращаем исходное состояние кнопки
-          button.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-              stroke="currentColor" class="size-5">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
-            </svg>
-            Скачать данные
-          `;
-          button.disabled = false;
-        });
+      return response.blob();
+    })
+    .then(blob => {
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = downloadUrl;
+      a.download = 'reestr.xlsx';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(downloadUrl);
+    })
+    .catch(error => {
+      console.error('Ошибка:', error);
+      alert('Не удалось загрузить файл.');
+    })
+    .finally(() => {
+      // Возвращаем исходное состояние кнопки
+      button.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+          stroke="currentColor" class="size-5">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+        </svg>
+        Скачать данные
+      `;
+      button.disabled = false;
     });
+ });

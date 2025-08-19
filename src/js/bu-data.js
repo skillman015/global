@@ -269,13 +269,13 @@ function toggleModal(modalId, show = null) {
     });
 
     // Поиск по Компании с debounce
-    let debounceTimercompany  = null;
+    let debounceTimercompany = null;
     document.getElementById('filter_company').addEventListener('input', (e) => {
       clearTimeout(debounceTimercompany);
       debounceTimercompany = setTimeout(() => {
-        filterState.company = e.target.value.trim();
-        filterState.page = 1;
-        loadTableData();
+        const value = e.target.value.trim();
+        const table = $('#myTable').DataTable();
+        table.column(20).search(value, true, false).draw(); // ✅ RegExp в действии
       }, 400);
     });
 
@@ -330,13 +330,21 @@ function toggleModal(modalId, show = null) {
           });
       });
 
+    let currentRecordId = null;
 
     $('#myTable tbody').on('dblclick', 'tr', function () {
       const rowData = table.row(this).data();
+      // Получаем ID из data-атрибута строки
+      const recordId = $(this).data('id');
 
+      // Сохраняем ID в глобальную переменную
+      currentRecordId = recordId;
+
+      // Также можно сохранить в модальное окно, если нужно
       const modal = document.getElementById('modalPaid');
-      modal.dataset.id = $(this).data('id');
-      console.log('Текущий ID:', modal.dataset.id);
+      modal.dataset.id = recordId;
+
+      console.log('Текущий ID:', currentRecordId);
 
       toggleModal('modalPaid');
     });
@@ -359,7 +367,8 @@ function toggleModal(modalId, show = null) {
         }
 
         const data = await response.json();
-        window.location.reload();
+        await loadTableData();
+
       } catch (error) {
         alert('Произошла ошибка: ' + error.message);
       }
@@ -383,40 +392,41 @@ function toggleModal(modalId, show = null) {
         }
 
         const data = await response.json();
-        window.location.reload();
+        await loadTableData();
+
       } catch (error) {
         alert('Произошла ошибка: ' + error.message);
       }
     }
 
-    document.getElementById('payed').addEventListener('click', function () {
-      const modal = document.getElementById('modalPaid');
-      const currentRecordId = modal.dataset.id;
+    document.getElementById('payed').addEventListener('click', async function () {
+        event.preventDefault();
 
       if (!currentRecordId) {
         alert('ID записи не найден!');
         return;
       }
         markAsPaidOnly(currentRecordId);
+        toggleModal('modalPaid', false); // закрыть модалку
     });
 
-    document.getElementById('not_payed').addEventListener('click', function () {
-      const modal = document.getElementById('modalPaid');
-      const currentRecordId = modal.dataset.id;
+    document.getElementById('not_payed').addEventListener('click', async function () {
+      event.preventDefault();
 
       if (!currentRecordId) {
         alert('ID записи не найден!');
         return;
       }
         markAsPaidNot(currentRecordId);
+        toggleModal('modalPaid', false); // закрыть модалку
     });
 
     loadTableData();
   });
 
-  document.getElementById('exit').addEventListener('click', function () {
-    window.location.href = '/index.html';
-  });
+   document.getElementById('exit').addEventListener('click', function () {
+      window.location.href = '/index.html';
+   });
 
    document.getElementById('download-excel').addEventListener('click', function (event) {
       event.preventDefault();
