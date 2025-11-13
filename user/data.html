@@ -140,7 +140,7 @@
         <th data-field="contract_number">Номер договора</th>
         <th data-field="contract_date">Дата договора</th>
         <th data-field="contract_amount">Сумма по договору</th>
-        <th data-field="actual_payment">Фактическая оплата</th>
+        <th data-field="payment_date">Дата оплаты</th>
         <th data-field="is_paid">Статус оплаты</th>
         <th data-field="evaluation_count">Количество оценок</th>
         <th data-field="bank_name">Наименование Банка</th>
@@ -224,7 +224,7 @@
                            </select>
                       </div>
 
-                      <div>
+                      <div style="display:none;"> # скрываем
                           <label class="mb-1 block text-xs font-medium text-blue-primary">Фактическая оплата</label>
                           <input
                               id="pay"
@@ -232,6 +232,18 @@
                               inputmode="numeric"
                               required
                             />
+                      </div>
+
+                        <div>
+                          <label class="mb-1 block text-xs font-medium text-blue-primary">Дата оплаты</label>
+                          <input
+                            id="pay_date"
+                            type="date"
+                            class="input-base border-default"
+                            min="1900-01-01"
+                            max="2099-12-31"
+                            required
+                          />
                       </div>
 
                       <div>

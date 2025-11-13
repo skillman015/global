@@ -85,17 +85,29 @@
         <div class="bg-gray-100 grid grid-cols-1 gap-4 rounded-2xl p-5 sm:grid-cols-2" style="width: 900px;" id="form-container">
 
            <div>
-               <select id="city-select" class="h-11 select-base border-default">
+                <label class="ml-2 mb-1 block text-sm font-medium text-gray-700">Филиал</label>
+               <select id="city-select" class="h-11 select-base border-default" title="Филиал">
                  <option value="" disabled selected>Выберите филиал</option>
                </select>
            </div>
 
-
-          <div>
+          <div style="display:none;"> # скрываем
               <input id="pay"
                      placeholder="Фактическая оплата"
                      class="input-base border-default"
                      inputmode="decimal" />
+          </div>
+
+          <div class="mb-1">
+              <label class="ml-2 mb-1 block text-sm font-medium text-gray-700">Дата оплаты</label>
+              <input id="pay_date"
+                     type="date"
+                     placeholder="Дата оплаты"
+                     class="input-base border-default" required
+                     min="1900-01-01"
+                     max="2099-12-31"
+                     title="Дата оплаты"
+              />
           </div>
 
           <div>
@@ -103,7 +115,8 @@
                      placeholder="ИИН/БИН"
                      class="input-base border-default"
                      maxlength="12"
-                     inputmode="numeric"/>
+                     inputmode="numeric"
+                     title="ИИН или БИН"/>
           </div>
 
           <div>
@@ -111,6 +124,7 @@
                      placeholder="Количество оценок"
                      type="number"
                      class="input-base border-default"
+                     title="Количество оценок"
                      required />
           </div>
 
@@ -118,11 +132,12 @@
               <input id="client"
                      placeholder="Наименование заказчика"
                      class="input-base border-default"
+                     title="Наименование заказчика"
                      required/>
           </div>
 
           <div class="mb-1">
-              <select id="bank" class="h-11 select-base border-default">
+              <select id="bank" class="h-11 select-base border-default" title="Наименование Банка">
                  <option value="" disabled selected> Выберите наименование Банка</option>
                    <option>Алатау Банк</option>
                    <option>Алтын Банк</option>
@@ -143,6 +158,7 @@
               <input id="payer"
                      placeholder="Плательщик"
                      class="input-base border-default"
+                     title="Плательщик"
                      required/>
           </div>
 
@@ -150,11 +166,12 @@
               <input id="cost"
                      placeholder="Стоимость"
                      class="input-base border-default"
+                     title="Стоимость"
                      required/>
           </div>
 
           <div class="mb-1">
-              <select id="object" class="h-11 select-base border-default">
+              <select id="object" class="h-11 select-base border-default" title="Объект оценки">
                  <option value="" disabled selected>Выберите объект оценки</option>
                    <option>Квартира</option>
                    <option>Жилой дом</option>
@@ -173,6 +190,7 @@
                      placeholder="Площадь, кв.м."
                      class="input-base border-default"
                      type="number"
+                     title="Площадь, кв.м."
                      required/>
           </div>
 
@@ -180,11 +198,13 @@
               <input id="address"
                      placeholder="Адрес"
                      class="input-base border-default"
+                     title="Адрес"
                      required/>
           </div>
 
           <div class="mb-1">
             <p id="result"
+               title="Стоимость за кв.м."
                class="input-base border-default">0
             </p>
           </div>
@@ -193,6 +213,7 @@
               <input id="number-deal"
                      placeholder="Номер договора"
                      class="input-base border-default"
+                     title="Номер договора"
                      required/>
           </div>
 
@@ -201,6 +222,7 @@
                      placeholder="Номер титулки"
                      class="input-base border-default"
                      type="number"
+                     title="Номер титулки"
                      required/>
           </div>
 
@@ -211,6 +233,7 @@
                      class="input-base border-default" required
                      min="1900-01-01"
                      max="2099-12-31"
+                     title="Дата договора"
               />
           </div>
 
@@ -218,6 +241,7 @@
               <input id="trip"
                      placeholder="Выездной исполнитель"
                      class="input-base border-default"
+                     title="Выездной исполнитель"
                      required/>
           </div>
 
@@ -226,11 +250,12 @@
                      placeholder="Сумма по договору"
                      class="input-base border-default"
                      inputmode="decimal"
+                     title="Сумма по договору"
                      required/>
           </div>
 
             <div>
-               <select id="company" class="h-11 select-base border-default">
+               <select id="company" class="h-11 select-base border-default" title="Оценочная компания">
                  <option value="" disabled selected>Выберите компанию</option>
                    <option>ТОО Global Capital</option>
                    <option>ТОО Global Capital-N</option>
@@ -245,7 +270,6 @@
               <p class="text-red-500 text-sm">* Необходимо заполнить все поля!</p>
             </div>
 
-
           <button type="submit"
                   id="add-data-btn"
                   class="bg-blue-primary w-full cursor-pointer rounded-lg py-1 h-11 text-xl text-white transition">
@@ -259,16 +283,9 @@
 </body>
 
 <script>
-      const payInput = document.getElementById('pay');
       const costInput = document.getElementById('cost');
       const binInput = document.getElementById('iin-bin');
       const sumInput = document.getElementById('sum-deal');
-
-      payInput.addEventListener('input', function (e) {
-        let value = e.target.value.replace(/\D/g, ''); // Удалить всё, кроме цифр
-        value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ' '); // Добавить пробелы каждые 3 цифры
-        e.target.value = value;
-      });
 
       costInput.addEventListener('input', function (e) {
         let value = e.target.value.replace(/\D/g, ''); // Удалить всё, кроме цифр
@@ -395,9 +412,8 @@
 
  async function submitForm() {
       const department = document.getElementById('city-select').value;
-        const payValue = document.getElementById('pay').value;
-        const cleanValue = payValue.replace(/\s/g, ''); // удаляет все пробелы
-        const actual_payment = parseFloat(cleanValue);
+        const actual_payment = 0;
+        const payment_date = document.getElementById('pay_date').value;
       const iin_bin = document.getElementById('iin-bin').value;
       const evaluation_count = document.getElementById('count-grade').value;
       const customer_name = document.getElementById('client').value;
@@ -424,7 +440,7 @@
         const company = document.getElementById('company').value;
 
       const requiredFields = [
-        'city-select', 'pay', 'iin-bin', 'count-grade', 'client', 'bank',
+        'city-select', 'pay_date', 'iin-bin', 'count-grade', 'client', 'bank',
         'payer', 'cost', 'object', 'area', 'address', 'number-deal',
         'number-titul', 'date-deal', 'trip', 'sum-deal', 'company'
       ];
@@ -441,6 +457,7 @@
       const payload = {
         department,
         actual_payment,
+        payment_date,
         iin_bin,
         evaluation_count,
         customer_name,

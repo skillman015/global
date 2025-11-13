@@ -286,20 +286,12 @@ function toggleModal(modalId, show = null) {
           dom: 'rtip',
           columnDefs: [
             {
-              targets: [9, 10, 14, 16],
+              targets: [9, 14, 16],
               render: function (data, type, row) {
                 if (type === 'display' || type === 'filter') {
                   return data.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
                 }
                 return data;
-              }
-            },
-            {
-              targets: [10],
-              orderable: false,
-              searchable: false,
-              render: function (data, type, row) {
-                return type === 'display' ? data : $(data).text();
               }
             }
           ]

@@ -32,12 +32,6 @@
     const binInput = document.getElementById('iin-bin');
     const sumInput = document.getElementById('sum-deal');
 
-    payInput.addEventListener('input', function (e) {
-      let value = e.target.value.replace(/\D/g, ''); // Удалить всё, кроме цифр
-      value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ' '); // Добавить пробелы каждые 3 цифры
-      e.target.value = value;
-    });
-
     costInput.addEventListener('input', function (e) {
       let value = e.target.value.replace(/\D/g, ''); // Удалить всё, кроме цифр
       value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ' '); // Добавить пробелы каждые 3 цифры
@@ -432,20 +426,12 @@
           dom: 'rtip',
           columnDefs: [
             {
-              targets: [9, 10, 14, 16],
+              targets: [9, 14, 16],
               render: function (data, type, row) {
                 if (type === 'display' || type === 'filter') {
                   return data.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
                 }
                 return data;
-              }
-            },
-            {
-              targets: [10],
-              orderable: false,
-              searchable: false,
-              render: function (data, type, row) {
-                return type === 'display' ? data : $(data).text();
               }
             }
           ]
@@ -500,9 +486,7 @@
       document.getElementById('date-deal').value = rowData[8];
          const sumValue = Math.trunc(parseFloat(rowData[9])); // убираем дробную часть
          document.getElementById('sum-deal').value = sumValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
-         const payValue = Math.trunc(parseFloat(rowData[10])); // убираем дробную часть
-         document.getElementById('pay').value = payValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-
+         document.getElementById('pay_date').value = rowData[10];
       document.getElementById('count-grade').value = rowData[12];
       document.getElementById('bank').value = rowData[13];
          const costValue = Math.trunc(parseFloat(rowData[14])); // убираем дробную часть
@@ -532,9 +516,8 @@
 
       async function submitForm(currentRecordId) {
           const department = document.getElementById('city-select').value;
-          const payValue = document.getElementById('pay').value.replace(/\s/g, '');
-          const actual_payment = parseFloat(payValue);
-
+          const actual_payment = 0;
+          const payment_date = document.getElementById('pay_date').value;
           const iin_bin = document.getElementById('iin-bin').value;
           const evaluation_count = document.getElementById('count-grade').value;
           const customer_name = document.getElementById('client').value;
@@ -553,7 +536,7 @@
           const company = document.getElementById('company').value;
 
           const requiredFields = [
-            'city-select', 'pay', 'iin-bin', 'count-grade', 'client', 'bank',
+            'city-select', 'pay_date', 'iin-bin', 'count-grade', 'client', 'bank',
             'payer', 'cost', 'object', 'area', 'address', 'number-deal',
             'number-titul', 'date-deal', 'trip', 'sum-deal', 'company'
           ];
@@ -570,6 +553,7 @@
           const payload = {
             department,
             actual_payment,
+            payment_date,
             iin_bin,
             evaluation_count,
             customer_name,
