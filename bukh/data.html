@@ -78,38 +78,107 @@
         <div class="bg-gray-100 my-6 rounded-lg bg-white" id="panel-container">
             <div class="bg-gray-100 flex flex-wrap gap-4 lg:flex-nowrap">
 
-                <!-- Filters -->
-                <div class="mb-1">
-                    <label class="mb-1 block text-sm text-center text-gray-700">Дата начала</label>
-                      <input
-                        id="start-date"
-                        type="date"
-                        placeholder="Дата договора"
-                        class="input-base border-default"
-                        min="1900-01-01"
-                        max="2099-12-31"
-                      />
+<!--                <div class="flex items-center gap-2">-->
+<!--                  <button-->
+<!--                    type="button"-->
+<!--                    id="btn-payment"-->
+<!--                    class="px-4 h-10 rounded-lg bg-blue-primary text-white transition"-->
+<!--                  >-->
+<!--                    По дате оплаты-->
+<!--                  </button>-->
+
+<!--                  <button-->
+<!--                    type="button"-->
+<!--                    id="btn-contract"-->
+<!--                    class="px-4 h-10 rounded-lg bg-gray-300 text-gray-700 transition"-->
+<!--                  >-->
+<!--                    По дате договора-->
+<!--                  </button>-->
+<!--                </div>-->
+
+                 <!-- Фильтр по дате договора -->
+                <div id="contract-filter" class="hidden">
+                    <div class="bg-gray-100 flex justify-center gap-4">
+                      <div class="flex flex-col items-center">
+
+                        <!-- Общий заголовок -->
+                        <label class="mb-1 block text-sm text-center text-gray-700">
+                          Фильтр по дате договора
+                        </label>
+
+                        <!-- Объединённый блок -->
+                        <div class="flex items-center rounded-lg overflow-hidden">
+
+                          <input
+                            id="start-date"
+                            type="date"
+                            class="input-base border-none focus:ring-0"
+                            min="1900-01-01"
+                            max="2099-12-31"
+                          />
+
+                          <span class="px-2 text-gray-400">—</span>
+
+                          <input
+                            id="end-date"
+                            type="date"
+                            class="input-base border-none focus:ring-0"
+                            min="1900-01-01"
+                            max="2099-12-31"
+                          />
+                        </div>
+                      </div>
+                            <button
+                              type="submit"
+                              id="date-filter"
+                              class="mt-6 bg-blue-primary cursor-pointer rounded-lg py-1 px-6 h-10 text-base text-white transition"
+                            >
+                          Применить
+                        </button>
+                    </div>
                 </div>
 
-                <div class="mb-1">
-                    <label class="mb-1 block text-sm text-center text-gray-700">Дата окончания</label>
-                      <input
-                        id="end-date"
-                        type="date"
-                        placeholder="Дата договора"
-                        class="input-base border-default"
-                        min="1900-01-01"
-                        max="2099-12-31"
-                      />
-                </div>
+                 <!-- Фильтр по оплате -->
+                <div id="payment-filter">
+                    <div class="bg-gray-100 flex justify-center gap-4">
+                      <div class="flex flex-col items-center">
 
-                <button
-                      type="submit"
-                      id="date-filter"
-                      class="mt-6 bg-blue-primary cursor-pointer rounded-lg py-1 px-6 h-10 text-base text-white transition"
-                    >
-                  Применить
-                </button>
+                        <!-- Общий заголовок -->
+                        <label class="mb-1 block text-sm text-center text-gray-700">
+                          Фильтр по дате оплаты
+                        </label>
+
+                        <!-- Объединённый блок -->
+                        <div class="flex items-center rounded-lg overflow-hidden">
+
+                          <input
+                            id="payment-start-date"
+                            type="date"
+                            class="input-base border-none focus:ring-0"
+                            min="1900-01-01"
+                            max="2099-12-31"
+                          />
+
+                          <span class="px-2 text-gray-400">—</span>
+
+                          <input
+                            id="payment-end-date"
+                            type="date"
+                            class="input-base border-none focus:ring-0"
+                            min="1900-01-01"
+                            max="2099-12-31"
+                          />
+                        </div>
+                      </div>
+                            <button
+                              type="submit"
+                              id="payment-date-filter"
+                              class="mt-6 bg-blue-primary cursor-pointer rounded-lg py-1 px-6 h-10 text-base text-white transition"
+                            >
+                          Применить
+                        </button>
+                    </div>
+                </div>
 
                 <button
                   type="submit"
@@ -238,6 +307,59 @@
 
   </main>
 </body>
+
+<!-- Спиннер-оверлей -->
+  <div id="spinner">
+    <div class="spinner-content">
+      <div class="spinner-icon"></div>
+      <p style="font-size: 1.125rem; color: #1f2937; font-weight: 500;">
+        Загрузка файла...
+      </p>
+    </div>
+  </div>
+
+<div
+ id="download-modal"
+  class="fixed inset-0 hidden z-50 flex items-center justify-center bg-black/50"
+>
+  <div class="bg-white rounded-lg p-6 w-80 relative">
+
+    <h3 class="text-center text-lg mb-4">
+      Период выгрузки
+    </h3>
+
+    <div class="flex flex-col gap-3">
+      <input
+        type="date"
+        id="download-start"
+        class="input-base border-default"
+      />
+
+      <input
+        type="date"
+        id="download-end"
+        class="input-base border-default"
+      />
+    </div>
+
+    <div class="flex justify-end gap-3 mt-6">
+      <button
+        id="cancel-download"
+        class="px-4 py-1 rounded-lg bg-gray-200 cursor-pointer"
+      >
+        Отмена
+      </button>
+
+      <button
+        id="confirm-download"
+        class="px-4 py-1 rounded-lg bg-green-600 text-white cursor-pointer"
+      >
+        Скачать
+      </button>
+    </div>
+
+  </div>
+</div>
 
 <script src="/src/js/bu-data.js"></script>
 

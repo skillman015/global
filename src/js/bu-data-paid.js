@@ -24,8 +24,8 @@ function toggleModal(modalId, show = null) {
     let nextPageUrl = null;
     let prevPageUrl = null;
     let filterState = {
-      contract_start_date: '',
-      contract_end_date: '',
+      payment_start_date: '',
+      payment_end_date: '',
       department__dep_name: '',
       iin_bin: '',
       customer_name: '',
@@ -42,8 +42,8 @@ function toggleModal(modalId, show = null) {
 
     function buildQueryParams() {
       const params = new URLSearchParams();
-      if (filterState.contract_start_date) params.append('contract_start_date', filterState.contract_start_date);
-      if (filterState.contract_end_date) params.append('contract_end_date', filterState.contract_end_date);
+      if (filterState.payment_start_date) params.append('payment_start_date', filterState.payment_start_date);
+      if (filterState.payment_end_date) params.append('payment_end_date', filterState.payment_end_date);
       if (filterState.department__dep_name) params.append('department__dep_name', filterState.department__dep_name);
       if (filterState.iin_bin) params.append('iin_bin', filterState.iin_bin);
       if (filterState.customer_name) params.append('customer_name', filterState.customer_name);
@@ -136,17 +136,17 @@ function toggleModal(modalId, show = null) {
     }
 
     // Фильтрация по дате
-    document.getElementById('date-filter').addEventListener('click', () => {
-      const startDate = document.getElementById('start-date').value;
-      const endDate = document.getElementById('end-date').value;
+    document.getElementById('payment-date-filter').addEventListener('click', () => {
+      const startDate = document.getElementById('payment-start-date').value;
+      const endDate = document.getElementById('payment-end-date').value;
 
       if (!startDate || !endDate) {
-        alert('Пожалуйста, выберите дату начала и дату окончания!');
+        alert('⚠️ Пожалуйста, выберите дату начала и дату окончания!');
         return;
       }
 
-      filterState.contract_start_date = startDate;
-      filterState.contract_end_date = endDate;
+      filterState.payment_start_date = startDate;
+      filterState.payment_end_date = endDate;
       filterState.page = 1;
       loadTableData();
     });

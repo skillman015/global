@@ -24,8 +24,8 @@ function toggleModal(modalId, show = null) {
     let nextPageUrl = null;
     let prevPageUrl = null;
     let filterState = {
-      contract_start_date: '',
-      contract_end_date: '',
+      payment_start_date: '',
+      payment_end_date: '',
       department__dep_name: '',
       iin_bin: '',
       customer_name: '',
@@ -42,8 +42,8 @@ function toggleModal(modalId, show = null) {
 
     function buildQueryParams() {
       const params = new URLSearchParams();
-      if (filterState.contract_start_date) params.append('contract_start_date', filterState.contract_start_date);
-      if (filterState.contract_end_date) params.append('contract_end_date', filterState.contract_end_date);
+      if (filterState.payment_start_date) params.append('payment_start_date', filterState.payment_start_date);
+      if (filterState.payment_end_date) params.append('payment_end_date', filterState.payment_end_date);
       if (filterState.department__dep_name) params.append('department__dep_name', filterState.department__dep_name);
       if (filterState.iin_bin) params.append('iin_bin', filterState.iin_bin);
       if (filterState.customer_name) params.append('customer_name', filterState.customer_name);
@@ -143,17 +143,17 @@ function toggleModal(modalId, show = null) {
     }
 
     // Фильтрация по дате
-    document.getElementById('date-filter').addEventListener('click', () => {
-      const startDate = document.getElementById('start-date').value;
-      const endDate = document.getElementById('end-date').value;
+    document.getElementById('payment-date-filter').addEventListener('click', () => {
+      const startDate = document.getElementById('payment-start-date').value;
+      const endDate = document.getElementById('payment-end-date').value;
 
       if (!startDate || !endDate) {
-        alert('Пожалуйста, выберите дату начала и дату окончания!');
+        alert('⚠️ Пожалуйста, выберите дату начала и дату окончания!');
         return;
       }
 
-      filterState.contract_start_date = startDate;
-      filterState.contract_end_date = endDate;
+      filterState.payment_start_date = startDate;
+      filterState.payment_end_date = endDate;
       filterState.page = 1;
       loadTableData();
     });
@@ -420,55 +420,61 @@ function toggleModal(modalId, show = null) {
       window.location.href = '/index.html';
    });
 
-   document.getElementById('download-excel').addEventListener('click', function (event) {
-      event.preventDefault();
+   document.getElementById('download-excel').addEventListener('click', function (e) {
+  e.preventDefault();
 
-      const startDate = document.getElementById('start-date').value;
-      const endDate = document.getElementById('end-date').value;
-      const button = document.getElementById('download-excel');
+  const modal = document.getElementById('download-modal');
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+});
 
-      if (!startDate || !endDate) {
-        alert('Пожалуйста, выберите дату начала и дату окончания');
-        return;
+
+document.getElementById('confirm-download').addEventListener('click', function () {
+
+  const startDate = document.getElementById('download-start').value;
+  const endDate = document.getElementById('download-end').value;
+  const button = document.getElementById('confirm-download');
+  const spinner   = document.getElementById('spinner');
+
+  if (!startDate || !endDate) {
+    alert('⚠️ Выберите период выгрузки');
+    return;
+  }
+
+  // показываем спиннер и блокируем кнопку
+  spinner.style.display = 'flex';
+
+  const url = `https://globalcapital.kz/api/reestr/download-excel/?start_date=${startDate}&end_date=${endDate}`;
+
+  authorizedFetch(url)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Ошибка при загрузке файла');
       }
+      return response.blob();
+    })
+    .then(blob => {
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = downloadUrl;
+      a.download = 'reestr.xlsx';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(downloadUrl);
 
-      // Изменяем текст и отключаем кнопку
-      button.textContent = 'Загрузка...';
-      button.disabled = true;
-
-      const url = `https://globalcapital.kz/api/reestr/download-excel/?start_date=${startDate}&end_date=${endDate}`;
-
-      authorizedFetch(url)
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Ошибка при загрузке файла');
-          }
-          return response.blob();
-        })
-        .then(blob => {
-          const downloadUrl = window.URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = downloadUrl;
-          a.download = 'reestr.xlsx';
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-          window.URL.revokeObjectURL(downloadUrl);
-        })
-        .catch(error => {
-          console.error('Ошибка:', error);
-          alert('Не удалось загрузить файл.');
-        })
-        .finally(() => {
-          // Возвращаем исходное состояние кнопки
-          button.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-              stroke="currentColor" class="size-5">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
-            </svg>
-            Скачать данные
-          `;
-          button.disabled = false;
-        });
+      // закрываем модалку после успешной загрузки
+      document.getElementById('download-modal').classList.add('hidden');
+    })
+    .catch(error => {
+      console.error('Ошибка:', error);
+      alert('Не удалось загрузить файл.');
+    })
+    .finally(() => {
+      spinner.style.display = 'none';
     });
+});
+
+document.getElementById('cancel-download').addEventListener('click', function () {
+  document.getElementById('download-modal').classList.add('hidden');
+});
